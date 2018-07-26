@@ -23,39 +23,46 @@
   </nav>
 
   <div class="container">
-    <!-- Page Layout here -->
-    <div class="row">
-
-      <div class="col s3">
-        <!-- Grey navigation panel -->
-        <p>chat</p>
-      </div>
-
-      <div class="col s9">
-        <div id="player" style="display: flex; justify-content: center;">
-          <form action="">
-            <i class="material-icons prefix">mode_edit</i>
-            <textarea id="name" class="materialize-textarea" placeholder="Enter player name" style="width:50%;"></textarea>
-            <button class="btn waves-effect waves-light" type="submit" name="action" id="submit">Start
-              <i class="material-icons right">send</i>
-            </button>
-          </form>
-        </div>
-
-        <div class="row">
-          <div class="col s4">
-            <h4>Player 1</h4>
-          </div>
-          <div class="col s4">
-            <h4>Summary</h4>
-          </div>
-          <div class="col s4">
-            <h4>Player 2</h4>
-          </div>
-        </div>
-      </div>
-
+    <div id="player" style="display: flex; justify-content: center;">
+      <form action="">
+        <i class="material-icons prefix">mode_edit</i>
+        <textarea id="name" class="materialize-textarea" placeholder="Enter player name" style="width:50%;"></textarea>
+        <button class="btn waves-effect waves-light" type="submit" name="action" id="submit">Start
+          <i class="material-icons right">send</i>
+        </button>
+      </form>
     </div>
+
+    <div class="row">
+      <div class="col s4">
+        <h5 id="player1_name">Player 1</h5>
+        <hr>
+        <div id="player1_content">
+          <a class="waves-effect waves-light btn-small">Rock</a>
+          <br>
+          <a class="waves-effect waves-light btn-small">Paper</a>
+          <br>
+          <a class="waves-effect waves-light btn-small">Scissors</a>
+        </div>
+      </div>
+      <div class="col s4">
+        <h5>Summary</h5>
+      </div>
+      <div class="col s4">
+        <h5 id="player2_name">Player 2</h5>
+        <hr>
+        <div id="player2_content">
+          <a class="waves-effect waves-light btn-small">Rock</a>
+          <br>
+          <a class="waves-effect waves-light btn-small">Paper</a>
+          <br>
+          <a class="waves-effect waves-light btn-small">Scissors</a>
+        </div>
+      </div>
+    </div>
+
+
+
   </div>
   <!-- Compiled and minified JavaScript -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>
@@ -65,105 +72,133 @@
 
   <script>
     // $(document).ready(function () {
-      // Initialize Firebase
-      var config = {
-        apiKey: "AIzaSyCviNrg0BFuKpH_S23NJmJh-kmhaMaa6Us",
-        authDomain: "rpsm-f4995.firebaseapp.com",
-        databaseURL: "https://rpsm-f4995.firebaseio.com",
-        projectId: "rpsm-f4995",
-        storageBucket: "",
-        messagingSenderId: "792785874613"
-      };
-      firebase.initializeApp(config);
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyCviNrg0BFuKpH_S23NJmJh-kmhaMaa6Us",
+      authDomain: "rpsm-f4995.firebaseapp.com",
+      databaseURL: "https://rpsm-f4995.firebaseio.com",
+      projectId: "rpsm-f4995",
+      storageBucket: "",
+      messagingSenderId: "792785874613"
+    };
+    firebase.initializeApp(config);
 
-      // Alias database and sub-levels.
-      var database = firebase.database();
-      console.log(database)
+    // Alias database and sub-levels.
+    var database = firebase.database();
 
-      // create root node for players
-      var playersRef = database.ref("/players");
-      var player1, player2;
+    // create root node for players
+    var playersRef = database.ref("/players");
+    var turnRef = database.ref("/turn");
+    var player1, player2;
 
-      // add listener to players node
-      playersRef.on("value", function (snapshot) {
-        // player 1
-        console.log(snapshot.child("player1").exists())
-        if (snapshot.child("player1").exists()) {
-          console.log("player1  exists")
-          console.log(snapshot.val())
-          player1 = true
-          // playersRef.child("player1").onDisconnect().remove();
-        } else {
-          player1 = false
-          console.log("player1 does not exists")
-        }
+    // add listener to players node
+    playersRef.on("value", function (snapshot) {
+      // player 1
 
-        // player 2
-        if (snapshot.child("player2").exists()) {
-          console.log("player2  exists")
-          player2 = true
-          // playersRef.child("player2").onDisconnect().remove();
-        } else {
-          player2 = false
-          console.log("player2 does not exists")
-        }
+      if (snapshot.child("player1").exists()) {
 
-        if (snapshot.numChildren() === 2) {
-          console.log(snapshot.child("player1").val())
-          $("#player").html(`<h5>Player 1: ${snapshot.child("player1").val().name} is playing Player 2: ${snapshot.child("player2").val().name}</h5> <hr> <button class="btn waves-effect waves-light reset" type="submit" name="action">Reset
+        player1 = true
+        // playersRef.child("player1").onDisconnect().remove();
+      } else {
+        player1 = false
+
+        // hide player1 console
+        $("#player1_content").hide()
+      }
+
+      // player 2
+      if (snapshot.child("player2").exists()) {
+
+        player2 = true
+        // playersRef.child("player2").onDisconnect().remove();
+      } else {
+        player2 = false
+
+        // hide player2 console
+        $("#player2_content").hide()
+      }
+
+      if (snapshot.numChildren() === 2) {
+
+        $("#player").html(`<h5>Player 1: ${snapshot.child("player1").val().name} is playing Player 2: ${snapshot.child("player2").val().name}</h5> <hr> <button class="btn waves-effect waves-light reset" type="submit" name="action">Reset
               <i class="material-icons right">send</i>
             </button>`)
-        }
+        // change names of Player 1 and 2
+        $("#player1_name").text(snapshot.child("player1").val().name)
+        $("#player2_name").text(snapshot.child("player2").val().name)
+        // show player consoles
+        $("#player1_content").show()
+        $("#player2_content").show()
+      }
 
-        // if (snapshot.numChildren() === 0) {
-        //   $("#player").html(`<form action="">
-        //     <i class="material-icons prefix">mode_edit</i>
-        //     <textarea id="name" class="materialize-textarea" placeholder="Enter player name" style="width:50%;"></textarea>
-        //     <button class="btn waves-effect waves-light submit" type="submit" name="action">Start
-        //       <i class="material-icons right">send</i>
-        //     </button>
-        //   </form>`)
-        // }
-      })
+      var player1Choice = snapshot.val().player1.choice;
+      var player2Choice = snapshot.val().player2.choice;
+      console.log(player1Choice !== "" && player2Choice !== ""){
+        compareChoices(player1Choice, player2Choice)
+      }
+    })
 
-      $(document).on('click', '.reset', function () {
-        playersRef.child("player1").remove();
-        playersRef.child("player2").remove();
-        location.reload();
-      })
 
-      var counter = 0;
-      $("#submit").on("click", function (e) {
-        e.preventDefault();
 
-        if (counter === 0) {
-          var name = $("#name").val().trim()
-          console.log(name)
 
-          if (name !== "") {
-            if (!player1) {
-              player1 = {
-                name: name,
-                choice: "",
-                wins: 0,
-                losses: 0,
-                ties: 0
-              }
-              playersRef.child("player1").set(player1)
-            } else if (!player2) {
-              player2 = {
-                name: name,
-                choice: "",
-                wins: 0,
-                losses: 0,
-                ties: 0
-              }
-              playersRef.child("player2").set(player2)
+    var turn = 1;
+    turnRef.on("value", function (snapshot) {
+      if (turn === 1) {
+        $("#player1_content *").addClass("option")
+        $("#player2_content *").removeClass("option")
+      }
+      if (turn === 2) {
+        $("#player2_content *").addClass("option")
+        $("#player1_content *").removeClass("option")
+      }
+    })
+
+    // record choice
+    $(document).on('click', '.option', function (event) {
+      playersRef.child(`player${turn}/choice`).set(event.currentTarget.text)
+
+      turn === 1 ? turn = 2 : turn = 1;
+      turnRef.set({ turn: turn })
+    })
+
+
+    $(document).on('click', '.reset', function () {
+      playersRef.child("player1").remove();
+      playersRef.child("player2").remove();
+      location.reload();
+    })
+
+    var counter = 0;
+    $("#submit").on("click", function (e) {
+      e.preventDefault();
+
+      if (counter === 0) {
+        var name = $("#name").val().trim()
+
+        if (name !== "") {
+          if (!player1) {
+            player1 = {
+              name: name,
+              choice: "",
+              wins: 0,
+              losses: 0,
+              ties: 0
             }
+            playersRef.child("player1").set(player1)
+          } else if (!player2) {
+            player2 = {
+              name: name,
+              choice: "",
+              wins: 0,
+              losses: 0,
+              ties: 0
+            }
+            playersRef.child("player2").set(player2)
           }
         }
-        counter++
-      })
+      }
+      counter++
+    })
 
 
 

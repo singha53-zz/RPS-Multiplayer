@@ -6,3 +6,7 @@ html {
   padding-top: 1rem;
   border: 2px solid black;
 }
+
+.btn-small {
+  margin: 3px;
+}
