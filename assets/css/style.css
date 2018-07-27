@@ -4,9 +4,13 @@ html {
 
 .row .col {
   padding-top: 1rem;
-  border: 2px solid black;
+  /* border: 2px solid black; */
 }
 
 .btn-small {
   margin: 3px;
+}
+
+h5, h6, p {
+  text-align: center;
 }
