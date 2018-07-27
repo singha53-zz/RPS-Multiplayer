@@ -11,6 +11,6 @@ html {
   margin: 3px;
 }
 
-h5, h6, p {
+h5, h6, p, a {
   text-align: center;
 }
